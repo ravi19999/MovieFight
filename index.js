@@ -1,7 +1,4 @@
-
-
-createAutoComplete({
-  root: document.querySelector(".autocomplete"),
+const autoCompleteConfig = {
   renderOption(movie) {
     const imgSrc = movie.Poster === "N/A" ? "" : movie.Poster;
     return `
@@ -9,9 +6,10 @@ createAutoComplete({
     ${movie.Title} (${movie.Year}) 
     `;
   },
-    onOptionSelect(movie) {
-      onMovieSelect(movie)
-    }
+
+  inputValue(movie) {
+    return movie.Title;
+  },
   async fetchData(searchTerm) {
     const response = await axios.get("http://www.omdbapi.com/", {
       params: {
@@ -19,15 +17,34 @@ createAutoComplete({
         s: searchTerm,
       },
     });
-  
+
     if (response.data.Error) {
       return [];
     }
-  
+
     return response.data.Search;
-  }
+  },
+};
+createAutoComplete({
+  ...autoCompleteConfig,
+  root: document.querySelector("#left-autocomplete"),
+  onOptionSelect(movie) {
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, document.querySelector("#left-summary"), "left");
+  },
 });
-const onMovieSelect = async (movie) => {
+createAutoComplete({
+  ...autoCompleteConfig,
+  root: document.querySelector("#right-autocomplete"),
+  onOptionSelect(movie) {
+    document.querySelector(".tutorial").classList.add("is-hidden");
+    onMovieSelect(movie, document.querySelector("#right-summary"), "right");
+  },
+});
+
+let leftMovie;
+let rightMovie;
+const onMovieSelect = async (movie, summaryElement) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "d9835cc5",
@@ -35,7 +52,21 @@ const onMovieSelect = async (movie) => {
     },
   });
 
-  document.querySelector("#summary").innerHTML = movieTemplate(response.data);
+  summaryElement.innerHTML = movieTemplate(response.data);
+
+  if (side === "left") {
+    leftMovie = response.data;
+  } else {
+    rightMovie = response.data;
+  }
+
+  if (leftMovie && rightMove) {
+    runComparision();
+  }
+};
+
+const runComparision = () => {
+  console.log("Let's compare");
 };
 
 const movieTemplate = (movieDetail) => {
