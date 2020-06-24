@@ -44,7 +44,7 @@ createAutoComplete({
 
 let leftMovie;
 let rightMovie;
-const onMovieSelect = async (movie, summaryElement) => {
+const onMovieSelect = async (movie, summaryElement, side) => {
   const response = await axios.get("http://www.omdbapi.com/", {
     params: {
       apikey: "d9835cc5",
@@ -60,7 +60,7 @@ const onMovieSelect = async (movie, summaryElement) => {
     rightMovie = response.data;
   }
 
-  if (leftMovie && rightMove) {
+  if (leftMovie && rightMovie) {
     runComparision();
   }
 };
@@ -70,6 +70,14 @@ const runComparision = () => {
 };
 
 const movieTemplate = (movieDetail) => {
+  const dollars = parseInt(
+    movieDetail.BoxOffice.replace(/\$/g, "").replace(/,/g, "")
+  ); //regular expression for removing '$' and ','
+  const metascore = parseInt(movieDetail.Metascore);
+  const imdbRating = parseFloat(movieDetail.imdbRating);
+  const imdbVotes = parseInt(movieDetail.imdbVotes.replace(/,/g, ""));
+  console.log(metascore, imdbRating, imdbVotes);
+
   return `
       <article class="media">
         <figure class="media-left">
